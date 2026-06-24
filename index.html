@@ -3,409 +3,354 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>openbank-bian · Open Banking, decomposed</title>
+<title>openbank-bian — Open Banking, decomposed</title>
 <meta name="description" content="A runnable reference implementation of UK Open Banking (OBIE) rebuilt as BIAN-style microservices in Go — what each service is, why it matters, and how composable, consent-first banking helps the industry evolve." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Hanken+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<meta property="og:title" content="openbank-bian — Open Banking, decomposed" />
+<meta property="og:description" content="UK Open Banking (OBIE) rebuilt as five BIAN microservices in Go. What is what, why it matters, and how composable consent-first banking helps the industry evolve." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/" />
 <style>
   :root{
-    --paper:#F3EFE6; --paper-2:#ECE7D9; --panel:#FBF9F3;
-    --ink:#15140F; --ink-soft:#403B30; --muted:#6E6757;
-    --line:rgba(21,20,15,.16); --line-strong:rgba(21,20,15,.32);
-    --accent:#1C5B43; --accent-ink:#0E3527; --accent-2:#B24A22; --gold:#967231;
-    --maxw:1180px;
-    --serif:"Fraunces",Georgia,serif; --sans:"Hanken Grotesk",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
+    --bg:#ffffff; --bg-2:#f5f5f7; --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#86868b;
+    --line:#d2d2d7; --line-soft:#e8e8ed;
+    --blue:#0071e3; --blue-hover:#0077ed; --blue-dark:#2997ff;
+    --dark:#1d1d1f; --black:#000000;
+    --radius:22px;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Menlo","Monaco",monospace;
+    --maxw:1024px; --maxw-wide:1120px;
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
   body{
-    margin:0; background:var(--paper); color:var(--ink);
-    font-family:var(--sans); font-size:17px; line-height:1.6;
-    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.47;
+    letter-spacing:-.01em; -webkit-font-smoothing:antialiased; overflow-x:hidden;
   }
-  /* grain + engraved atmosphere */
-  body::before{
-    content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.04;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:1}
-  a{color:inherit}
+  a{color:var(--blue); text-decoration:none}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 22px}
+  .wide{max-width:var(--maxw-wide)}
+  section{scroll-margin-top:54px}
 
-  /* ---------- top bar ---------- */
-  .bar{position:sticky; top:0; z-index:50; backdrop-filter:blur(6px);
-    background:color-mix(in srgb, var(--paper) 86%, transparent);
-    border-bottom:1px solid var(--line)}
-  .bar .wrap{display:flex; align-items:center; justify-content:space-between; height:60px}
-  .mark{font-family:var(--mono); font-size:13px; letter-spacing:.06em; text-transform:uppercase;
-    display:flex; align-items:center; gap:10px}
-  .mark .dot{width:9px; height:9px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%, transparent)}
-  .bar nav{display:flex; gap:26px; font-size:13.5px; font-weight:500}
-  .bar nav a{text-decoration:none; color:var(--ink-soft); position:relative; padding:4px 0}
-  .bar nav a::after{content:""; position:absolute; left:0; bottom:-2px; height:2px; width:0; background:var(--accent); transition:width .28s ease}
-  .bar nav a:hover{color:var(--ink)} .bar nav a:hover::after{width:100%}
-  .bar .gh{font-family:var(--mono); font-size:12.5px}
-  @media(max-width:760px){ .bar nav{display:none} }
+  /* link with chevron */
+  .clink{color:var(--blue); font-size:17px; display:inline-flex; align-items:center; gap:2px}
+  .clink .ch{transition:transform .25s ease}
+  .clink:hover{text-decoration:underline} .clink:hover .ch{transform:translateX(3px)}
 
-  .progress{position:fixed; top:0; left:0; height:2px; background:var(--accent-2); z-index:60; width:0}
+  /* pill button */
+  .btn{display:inline-flex; align-items:center; gap:6px; background:var(--blue); color:#fff;
+    font-size:17px; padding:11px 22px; border-radius:980px; transition:background .25s ease}
+  .btn:hover{background:var(--blue-hover)}
+
+  /* ---------- nav ---------- */
+  .nav{position:sticky; top:0; z-index:100; height:48px;
+    background:rgba(255,255,255,.72); backdrop-filter:saturate(180%) blur(20px);
+    -webkit-backdrop-filter:saturate(180%) blur(20px); border-bottom:1px solid var(--line-soft)}
+  .nav .row{max-width:var(--maxw-wide); margin:0 auto; padding:0 22px; height:48px;
+    display:flex; align-items:center; justify-content:space-between}
+  .nav .brand{font-size:15px; font-weight:600; color:var(--ink); letter-spacing:-.01em}
+  .nav .brand .o{color:var(--blue)}
+  .nav .links{display:flex; gap:28px}
+  .nav .links a{color:var(--ink-2); font-size:12px; font-weight:400; letter-spacing:0}
+  .nav .links a:hover{color:var(--ink)}
+  @media(max-width:720px){ .nav .links{display:none} }
 
   /* ---------- hero ---------- */
-  .hero{padding:88px 0 64px; position:relative}
-  .hero .rule-motif{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
-    -webkit-mask-image:linear-gradient(180deg,#000,transparent 78%); mask-image:linear-gradient(180deg,#000,transparent 78%)}
-  .eyebrow{font-family:var(--mono); font-size:12.5px; letter-spacing:.16em; text-transform:uppercase;
-    color:var(--accent-ink); display:flex; align-items:center; gap:12px}
-  .eyebrow .bk{height:1px; width:46px; background:var(--accent); display:inline-block}
-  h1{font-family:var(--serif); font-weight:900; font-optical-sizing:auto;
-    font-size:clamp(2.9rem,8vw,6.4rem); line-height:.96; letter-spacing:-.015em; margin:.32em 0 .18em}
-  h1 em{font-style:italic; font-weight:500; color:var(--accent)}
-  .stand{max-width:43ch; font-size:clamp(1.05rem,1.5vw,1.32rem); color:var(--ink-soft); line-height:1.5}
-  .stand b{color:var(--ink); font-weight:700}
-  .meta{display:flex; flex-wrap:wrap; gap:0; margin-top:40px; border-top:1px solid var(--line-strong); border-bottom:1px solid var(--line-strong)}
-  .meta .cell{flex:1 1 150px; padding:18px 20px 16px; border-right:1px solid var(--line)}
-  .meta .cell:last-child{border-right:0}
-  .meta .k{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
-  .meta .v{font-family:var(--serif); font-weight:600; font-size:1.5rem; margin-top:4px}
-  .meta .v small{font-family:var(--sans); font-size:.78rem; color:var(--muted); font-weight:500}
+  .hero{text-align:center; padding:96px 0 72px;
+    background:radial-gradient(130% 90% at 50% -10%, #f5f8ff 0%, #ffffff 46%)}
+  .eyebrow{font-size:19px; font-weight:600; color:var(--blue); letter-spacing:-.01em; margin-bottom:12px}
+  .hero h1{font-size:clamp(40px,8vw,88px); font-weight:700; line-height:1.04; letter-spacing:-.035em; margin:0}
+  .hero h1 .grad{background:linear-gradient(92deg,#0071e3,#42a5ff 60%,#5e5ce6);
+    -webkit-background-clip:text; background-clip:text; color:transparent}
+  .hero p.sub{max-width:30ch; margin:22px auto 0; font-size:clamp(19px,2.4vw,24px);
+    line-height:1.38; color:var(--ink-2); font-weight:400; letter-spacing:-.015em}
+  .hero .cta{margin-top:30px; display:flex; gap:26px; justify-content:center; align-items:center; flex-wrap:wrap}
+  .hero .stats{margin-top:58px; display:flex; flex-wrap:wrap; justify-content:center; gap:0;
+    max-width:920px; margin-left:auto; margin-right:auto;
+    border:1px solid var(--line-soft); border-radius:var(--radius); background:#fff; overflow:hidden}
+  .hero .stats .s{flex:1 1 160px; padding:22px 16px; border-right:1px solid var(--line-soft)}
+  .hero .stats .s:last-child{border-right:0}
+  .hero .stats .num{font-size:30px; font-weight:600; letter-spacing:-.02em}
+  .hero .stats .lbl{font-size:13px; color:var(--ink-3); margin-top:3px}
 
   /* reveal */
-  .reveal{opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .8s cubic-bezier(.28,.11,.32,1), transform .8s cubic-bezier(.28,.11,.32,1)}
   .reveal.in{opacity:1; transform:none}
   @media(prefers-reduced-motion:reduce){ .reveal{opacity:1; transform:none; transition:none} html{scroll-behavior:auto} }
 
-  /* ---------- section frame ---------- */
-  section{padding:84px 0; border-top:1px solid var(--line)}
-  .sec-head{display:flex; gap:22px; align-items:baseline; margin-bottom:40px}
-  .sec-no{font-family:var(--mono); font-size:13px; color:var(--accent-2); letter-spacing:.1em; padding-top:8px}
-  .sec-title{font-family:var(--serif); font-weight:900; font-size:clamp(1.9rem,4vw,3rem); line-height:1.02; letter-spacing:-.01em; margin:0}
-  .sec-lede{max-width:62ch; color:var(--ink-soft); font-size:1.08rem; margin:14px 0 0}
+  /* ---------- section heads ---------- */
+  .band{padding:clamp(84px,12vh,140px) 0}
+  .band.alt{background:var(--bg-2)}
+  .band.dark{background:var(--black); color:#f5f5f7}
+  .sec-head{text-align:center; max-width:760px; margin:0 auto 56px}
+  .sec-head .kicker{font-size:21px; font-weight:600; color:var(--blue); margin-bottom:8px}
+  .sec-head h2{font-size:clamp(32px,5vw,56px); font-weight:700; line-height:1.06; letter-spacing:-.025em; margin:0}
+  .sec-head p{font-size:clamp(18px,2vw,21px); color:var(--ink-2); margin:16px auto 0; max-width:62ch; line-height:1.42; font-weight:400}
 
-  /* ---------- service cards ---------- */
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:0; border:1px solid var(--line-strong)}
-  .card{padding:26px 24px 22px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);
-    background:var(--panel); position:relative; text-decoration:none; color:inherit; display:flex; flex-direction:column; gap:12px;
-    transition:background .3s ease, transform .3s ease}
-  .card:hover{background:#fff; transform:translateY(-3px)}
-  .card::before{content:""; position:absolute; left:0; top:0; height:3px; width:0; background:var(--accent); transition:width .35s ease}
-  .card:hover::before{width:100%}
-  .card .top{display:flex; align-items:flex-start; justify-content:space-between}
-  .card .port{font-family:var(--mono); font-size:12px; color:var(--muted)}
-  .card .name{font-family:var(--serif); font-weight:600; font-size:1.55rem; line-height:1.05}
-  .card .tags{display:flex; gap:8px; flex-wrap:wrap}
-  .tag{font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; text-transform:uppercase;
-    padding:3px 8px; border:1px solid var(--line-strong); border-radius:2px; color:var(--ink-soft)}
-  .tag.ais{color:var(--accent); border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
-  .card p{margin:0; font-size:.96rem; color:var(--ink-soft); line-height:1.5}
-  .eps{display:flex; flex-wrap:wrap; gap:5px; margin-top:2px}
-  .ep{font-family:var(--mono); font-size:10.5px; color:var(--accent-ink); background:color-mix(in srgb,var(--accent) 9%,transparent);
-    padding:2px 7px; border-radius:2px; white-space:nowrap}
-  .card .go{margin-top:auto; font-family:var(--mono); font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--accent-2);
-    display:inline-flex; align-items:center; gap:7px}
-  .card .go .arr{transition:transform .3s ease} .card:hover .go .arr{transform:translateX(5px)}
+  /* ---------- bento services ---------- */
+  .bento{max-width:var(--maxw-wide); margin:0 auto; padding:0 22px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+  .tile{background:var(--bg-2); border-radius:24px; padding:30px 30px 26px; min-height:248px;
+    display:flex; flex-direction:column; position:relative; color:var(--ink); text-decoration:none;
+    transition:transform .35s cubic-bezier(.28,.11,.32,1), box-shadow .35s ease}
+  a.tile:hover{transform:translateY(-4px); box-shadow:0 18px 40px rgba(0,0,0,.10)}
+  .tile.feature{grid-column:span 2; grid-row:span 2; background:var(--dark); color:#f5f5f7}
+  .tile.spanwide{grid-column:span 2}
+  .tile .port{font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+  .tile.feature .port{color:#86868b}
+  .tile h3{font-size:26px; font-weight:600; letter-spacing:-.02em; margin:10px 0 0}
+  .tile.feature h3{font-size:40px; margin-top:14px}
+  .tile .cat{font-size:13px; font-weight:600; color:var(--blue); margin-top:6px}
+  .tile.feature .cat{color:var(--blue-dark)}
+  .tile p{font-size:15.5px; line-height:1.45; color:var(--ink-2); margin:14px 0 0; max-width:48ch}
+  .tile.feature p{color:#c7c7cc; font-size:18px; max-width:34ch}
+  .tile .eps{display:flex; flex-wrap:wrap; gap:6px; margin-top:16px}
+  .tile .ep{font-family:var(--mono); font-size:11px; padding:3px 9px; border-radius:980px;
+    background:rgba(0,0,0,.05); color:var(--ink-2)}
+  .tile.feature .ep{background:rgba(255,255,255,.12); color:#e5e5ea}
+  .tile .more{margin-top:auto; padding-top:18px; font-size:15px; color:var(--blue)}
+  .tile.feature .more{color:var(--blue-dark)}
+  .tile .more .ch{transition:transform .25s} a.tile:hover .more .ch{transform:translateX(3px)}
+  @media(max-width:900px){
+    .bento{grid-template-columns:repeat(2,1fr)}
+    .tile.feature{grid-column:span 2; grid-row:auto}
+    .tile.spanwide{grid-column:span 2}
+  }
+  @media(max-width:560px){
+    .bento{grid-template-columns:1fr}
+    .tile,.tile.feature,.tile.spanwide{grid-column:auto}
+  }
 
   /* ---------- diagram ---------- */
-  .diagram{margin-top:46px; border:1px solid var(--line-strong); background:var(--panel); padding:14px}
-  .diagram figcaption{font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
-    display:flex; justify-content:space-between; padding:8px 8px 14px}
-  svg .node{fill:#fff; stroke:var(--line-strong)}
-  svg .node-hub{fill:var(--accent); stroke:var(--accent-ink)}
-  svg .lbl{font-family:var(--serif); font-weight:600; fill:var(--ink)}
-  svg .lbl-hub{fill:#F3EFE6}
-  svg .sub{font-family:var(--mono); font-size:11px; letter-spacing:.04em}
-  svg .sub-mut{fill:var(--muted)} svg .sub-hub{fill:color-mix(in srgb,#fff 80%,var(--accent))}
-  svg .flow{stroke:var(--ink-soft); stroke-width:1.4; fill:none}
-  svg .flow-2{stroke:var(--accent-2); stroke-width:1.4; fill:none; stroke-dasharray:5 4}
-  svg .flow-lbl{font-family:var(--mono); font-size:10.5px; fill:var(--muted)}
+  .diagram{max-width:var(--maxw-wide); margin:64px auto 0; padding:0 22px}
+  .diagram .card{background:#fff; border:1px solid var(--line-soft); border-radius:28px; padding:26px 20px 14px;
+    box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .alt .diagram .card{background:#fff}
+  .diagram .cap{text-align:center; font-size:14px; color:var(--ink-3); padding:14px 0 6px}
+  svg .node{fill:#fff; stroke:var(--line)} svg .node-hub{fill:var(--dark); stroke:var(--dark)}
+  svg .lbl{font-family:var(--sans); font-weight:600; fill:var(--ink)} svg .lbl-hub{fill:#fff}
+  svg .sub{font-family:var(--mono); font-size:11px} svg .sub-mut{fill:var(--ink-3)} svg .sub-hub{fill:#a1a1a6}
+  svg .flow{stroke:var(--ink-3); stroke-width:1.5; fill:none}
+  svg .flow-2{stroke:var(--blue); stroke-width:1.5; fill:none; stroke-dasharray:5 4}
+  svg .flow-lbl{font-family:var(--mono); font-size:10.5px; fill:var(--ink-3)}
 
-  /* ---------- why / how : numbered rows ---------- */
-  .rows{border-top:1px solid var(--line-strong)}
-  .row{display:grid; grid-template-columns:64px 1fr; gap:0; border-bottom:1px solid var(--line); padding:26px 0; align-items:start}
-  .row .n{font-family:var(--mono); font-size:13px; color:var(--accent-2)}
-  .row .body h3{font-family:var(--serif); font-weight:600; font-size:1.5rem; margin:0 0 8px; letter-spacing:-.005em}
-  .row .body p{margin:0; color:var(--ink-soft); max-width:74ch}
-  .row .body .pin{font-family:var(--mono); font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:.06em; display:block; margin-top:10px}
+  /* ---------- feature rows (why / how) ---------- */
+  .feats{max-width:980px; margin:0 auto; display:grid; grid-template-columns:repeat(2,1fr); gap:20px}
+  .feat{background:#fff; border-radius:20px; padding:28px 28px 26px; border:1px solid var(--line-soft)}
+  .alt .feat{background:#fff}
+  .feat .fk{font-family:var(--mono); font-size:12px; color:var(--blue); letter-spacing:.02em}
+  .feat h3{font-size:22px; font-weight:600; letter-spacing:-.015em; margin:12px 0 8px; line-height:1.18}
+  .feat p{font-size:16px; color:var(--ink-2); margin:0; line-height:1.5}
+  .feat code{font-family:var(--mono); font-size:13px; background:var(--bg-2); padding:1px 6px; border-radius:6px}
+  .feat.full{grid-column:span 2}
+  @media(max-width:720px){ .feats{grid-template-columns:1fr} .feat.full{grid-column:auto} }
 
-  /* ---------- pull quote ---------- */
-  .quote{padding:0; border:0}
-  .quote .wrap{padding:70px 28px}
-  .quote blockquote{margin:0; font-family:var(--serif); font-weight:500; font-style:italic;
-    font-size:clamp(1.6rem,3.6vw,2.7rem); line-height:1.18; letter-spacing:-.01em; max-width:20ch}
-  .quote blockquote span{color:var(--accent)}
-  .quote .by{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:26px}
+  /* ---------- statement (dark) ---------- */
+  .statement{text-align:center; max-width:18ch; margin:0 auto}
+  .statement h2{font-size:clamp(34px,6vw,64px); font-weight:700; line-height:1.08; letter-spacing:-.03em; margin:0}
+  .statement h2 .hl{color:var(--blue-dark)}
+  .statement .by{font-size:15px; color:#86868b; margin-top:28px; letter-spacing:0}
 
   /* ---------- repos ---------- */
-  .repos{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:0; border:1px solid var(--line-strong)}
-  .repo{padding:22px 22px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); text-decoration:none; color:inherit;
-    display:flex; align-items:center; justify-content:space-between; gap:14px; background:var(--panel); transition:background .3s}
-  .repo:hover{background:#fff}
-  .repo .nm{font-family:var(--mono); font-size:14px}
-  .repo .nm small{display:block; color:var(--muted); font-family:var(--sans); font-size:12px; margin-top:4px}
-  .repo .ic{color:var(--accent-2); font-family:var(--mono); transition:transform .3s} .repo:hover .ic{transform:translate(3px,-3px)}
-  .runbox{margin-top:34px; background:var(--ink); color:#EDE9DD; border-radius:4px; overflow:hidden; font-family:var(--mono); font-size:13px}
-  .runbox .hd{padding:10px 16px; border-bottom:1px solid rgba(255,255,255,.12); color:#A9A290; letter-spacing:.08em; font-size:11px; text-transform:uppercase}
-  .runbox pre{margin:0; padding:18px 16px; overflow-x:auto; line-height:1.7}
-  .runbox .c{color:#7FB79E} .runbox .p{color:#E0996B}
+  .repolist{max-width:840px; margin:0 auto; background:#fff; border:1px solid var(--line-soft);
+    border-radius:20px; overflow:hidden}
+  .alt .repolist{background:#fff}
+  .repo{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:20px 24px;
+    border-bottom:1px solid var(--line-soft); text-decoration:none; color:var(--ink); transition:background .2s}
+  .repo:last-child{border-bottom:0}
+  .repo:hover{background:var(--bg-2)}
+  .repo .nm{font-family:var(--mono); font-size:15px; color:var(--ink)}
+  .repo .nm small{display:block; font-family:var(--sans); font-size:13px; color:var(--ink-3); margin-top:3px; letter-spacing:-.01em}
+  .repo .ch{color:var(--blue); font-size:20px; transition:transform .25s} .repo:hover .ch{transform:translateX(3px)}
+  .runbox{max-width:840px; margin:30px auto 0; background:var(--dark); color:#f5f5f7; border-radius:18px; overflow:hidden}
+  .runbox .hd{padding:13px 20px; border-bottom:1px solid rgba(255,255,255,.1); font-size:12px; color:#a1a1a6}
+  .runbox pre{margin:0; padding:20px; overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.75}
+  .runbox .c{color:#7d8590} .runbox .p{color:#ff9f6b}
 
   /* ---------- footer ---------- */
-  footer{border-top:1px solid var(--line-strong); padding:46px 0 70px; color:var(--muted); font-size:13.5px}
-  footer .grid2{display:flex; flex-wrap:wrap; justify-content:space-between; gap:24px}
-  .disclaimer{max-width:60ch; font-size:12.5px; line-height:1.6; margin-top:22px; padding-top:18px; border-top:1px dashed var(--line-strong)}
-  footer a{color:var(--ink-soft)}
+  footer{background:var(--bg-2); border-top:1px solid var(--line); padding:40px 0 56px; color:var(--ink-3); font-size:12px; line-height:1.5}
+  footer .top{display:flex; flex-wrap:wrap; justify-content:space-between; gap:14px; padding-bottom:18px; border-bottom:1px solid var(--line)}
+  footer .brand{font-weight:600; color:var(--ink-2); font-size:14px}
+  footer .disc{margin-top:18px; max-width:74ch}
+  footer a{color:var(--ink-2)}
 </style>
 </head>
 <body>
-<div class="progress" id="progress"></div>
 
-<header class="bar">
+<nav class="nav">
+  <div class="row">
+    <div class="brand"><span class="o">●</span>&nbsp; openbank-bian</div>
+    <div class="links">
+      <a href="#what">Services</a>
+      <a href="#why">Why</a>
+      <a href="#how">Evolution</a>
+      <a href="#repos">Code</a>
+    </div>
+    <a class="links-gh" href="https://github.com/Sreenivas-Sadhu-Prabhakara?tab=repositories&q=openbank" target="_blank" rel="noopener" style="font-size:12px;color:var(--ink-2)">GitHub ›</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
   <div class="wrap">
-    <div class="mark"><span class="dot"></span> openbank&middot;bian</div>
-    <nav>
-      <a href="#what">What is what</a>
-      <a href="#why">Why it matters</a>
-      <a href="#how">How banking evolves</a>
-      <a href="#repos">Repositories</a>
-    </nav>
-    <a class="gh" href="https://github.com/Sreenivas-Sadhu-Prabhakara?tab=repositories&q=openbank" target="_blank" rel="noopener">GitHub &nearr;</a>
+    <div class="eyebrow reveal">UK Open Banking · BIAN · Go</div>
+    <h1 class="reveal">Open Banking,<br><span class="grad">decomposed.</span></h1>
+    <p class="sub reveal">A runnable reference that rebuilds the bank as small, independent, consent-first services.</p>
+    <div class="cta reveal">
+      <a class="btn" href="#what">Explore the services</a>
+      <a class="clink" href="https://github.com/Sreenivas-Sadhu-Prabhakara?tab=repositories&q=openbank" target="_blank" rel="noopener">View on GitHub <span class="ch">›</span></a>
+    </div>
+    <div class="stats reveal">
+      <div class="s"><div class="num">5</div><div class="lbl">Microservices</div></div>
+      <div class="s"><div class="num">OBIE</div><div class="lbl">UK Open Banking APIs</div></div>
+      <div class="s"><div class="num">BIAN</div><div class="lbl">Service domains</div></div>
+      <div class="s"><div class="num">Go 1.25</div><div class="lbl">+ Postgres</div></div>
+      <div class="s"><div class="num">~97</div><div class="lbl">Tests, two tiers</div></div>
+    </div>
   </div>
 </header>
 
-<!-- HERO -->
-<div class="hero">
-  <svg class="rule-motif" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
-    <defs><pattern id="eng" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
-      <line x1="0" y1="0" x2="0" y2="9" stroke="#1C5B43" stroke-width="0.5"/>
-    </pattern></defs>
-    <rect width="100%" height="100%" fill="url(#eng)"/>
-  </svg>
-  <div class="wrap">
-    <div class="eyebrow reveal"><span class="bk"></span> Reference implementation &nbsp;·&nbsp; UK Open Banking &times; BIAN &times; Go</div>
-    <h1 class="reveal">Open Banking,<br><em>decomposed.</em></h1>
-    <p class="stand reveal">A working blueprint that rebuilds a bank's capabilities as small, independent, <b>consent-first services</b> any third party can safely build on. Five microservices. Real OBIE APIs. A full test suite. This is what the next shape of banking actually looks like in code.</p>
-    <div class="meta reveal">
-      <div class="cell"><div class="k">Services</div><div class="v">5 <small>independent</small></div></div>
-      <div class="cell"><div class="k">API standard</div><div class="v">OBIE <small>UK Open Banking</small></div></div>
-      <div class="cell"><div class="k">Architecture</div><div class="v">BIAN <small>service domains</small></div></div>
-      <div class="cell"><div class="k">Built with</div><div class="v">Go 1.25 <small>+ Postgres</small></div></div>
-      <div class="cell"><div class="k">Tests</div><div class="v">~97 <small>2 tiers</small></div></div>
+<!-- 01 WHAT -->
+<section id="what" class="band">
+  <div class="sec-head reveal">
+    <div class="kicker">What is what</div>
+    <h2>Five services. One trust anchor.</h2>
+    <p>Each capability of the bank is its own service — it owns its data, speaks Open Banking on the wire, and deploys on its own. Nothing is read or paid without an authorised consent that the Consent service has issued.</p>
+  </div>
+
+  <div class="bento reveal">
+    <a class="tile feature" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-consent" target="_blank" rel="noopener">
+      <div class="port">:8081</div>
+      <h3>Consent</h3>
+      <div class="cat">BIAN · Consent Administration</div>
+      <p>The trust anchor. Owns the lifecycle of every consent — account-access, payment and funds-confirmation — from awaiting → authorised → consumed / revoked. Every other service validates against it.</p>
+      <div class="eps"><span class="ep">POST /account-access-consents</span><span class="ep">/authorise</span><span class="ep">/internal/consents/{id}</span></div>
+      <span class="more">View repository <span class="ch">›</span></span>
+    </a>
+    <a class="tile" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-accounts" target="_blank" rel="noopener">
+      <div class="port">:8082</div>
+      <h3>Accounts</h3>
+      <div class="cat">OBIE · AISP</div>
+      <p>Account Information — accounts, balances and transactions, for a consent that permits it.</p>
+      <span class="more">Repo <span class="ch">›</span></span>
+    </a>
+    <a class="tile" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-payments" target="_blank" rel="noopener">
+      <div class="port">:8083</div>
+      <h3>Payments</h3>
+      <div class="cat">OBIE · PISP</div>
+      <p>Payment Initiation — turns a single-use payment consent into an idempotent domestic payment.</p>
+      <span class="more">Repo <span class="ch">›</span></span>
+    </a>
+    <a class="tile" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-funds" target="_blank" rel="noopener">
+      <div class="port">:8084</div>
+      <h3>Funds</h3>
+      <div class="cat">OBIE · CBPII</div>
+      <p>Confirmation of Funds — a yes/no on availability. Asks Accounts; never stores balances itself.</p>
+      <span class="more">Repo <span class="ch">›</span></span>
+    </a>
+    <a class="tile" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-party" target="_blank" rel="noopener">
+      <div class="port">:8085</div>
+      <h3>Party</h3>
+      <div class="cat">BIAN · Party Reference Data</div>
+      <p>The customer identity behind the accounts — readable only with the <em>ReadParty</em> permission.</p>
+      <span class="more">Repo <span class="ch">›</span></span>
+    </a>
+    <div class="tile spanwide" style="cursor:default">
+      <div class="port">shared library</div>
+      <h3 style="color:var(--blue)">pkg</h3>
+      <div class="cat" style="color:var(--ink-3)">vendored into every repo</div>
+      <p>The shared spine — OBIE response &amp; error envelopes, an exact-decimal money type, HTTP middleware, Postgres helpers and the inter-service clients. Two test tiers: in-memory unit tests, plus Postgres integration tests via testcontainers.</p>
     </div>
   </div>
-</div>
 
-<!-- 01 WHAT -->
-<section id="what">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="sec-no">01</div>
-      <div>
-        <h2 class="sec-title">What is what</h2>
-        <p class="sec-lede">Each capability of the bank is its own service: it owns its data, speaks Open Banking on the wire, and is deployed and scaled on its own. One service — <b>Consent</b> — sits at the centre; nothing is read or paid without an authorised consent it has issued.</p>
-      </div>
-    </div>
-
-    <div class="grid reveal">
-      <a class="card" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-consent" target="_blank" rel="noopener">
-        <div class="top"><div class="name">Consent</div><div class="port">:8081</div></div>
-        <div class="tags"><span class="tag ais">BIAN · Consent Admin</span><span class="tag">All 3 consent types</span></div>
-        <p>The trust anchor. Owns the lifecycle of every consent — account-access, payment and funds-confirmation — from <em>awaiting</em> → <em>authorised</em> → <em>consumed / revoked</em>.</p>
-        <div class="eps"><span class="ep">POST /account-access-consents</span><span class="ep">/authorise</span></div>
-        <span class="go">View repository <span class="arr">&rarr;</span></span>
-      </a>
-      <a class="card" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-accounts" target="_blank" rel="noopener">
-        <div class="top"><div class="name">Accounts</div><div class="port">:8082</div></div>
-        <div class="tags"><span class="tag ais">OBIE · AISP</span><span class="tag">Read</span></div>
-        <p>Account Information. Serves accounts, balances and transactions to a third party that holds an authorised, correctly-permissioned consent.</p>
-        <div class="eps"><span class="ep">GET /accounts</span><span class="ep">/balances</span><span class="ep">/transactions</span></div>
-        <span class="go">View repository <span class="arr">&rarr;</span></span>
-      </a>
-      <a class="card" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-payments" target="_blank" rel="noopener">
-        <div class="top"><div class="name">Payments</div><div class="port">:8083</div></div>
-        <div class="tags"><span class="tag ais">OBIE · PISP</span><span class="tag">Write</span></div>
-        <p>Payment Initiation. Turns an authorised single-use payment consent into a domestic payment — idempotent, amount-matched, consent-consuming.</p>
-        <div class="eps"><span class="ep">POST /domestic-payments</span><span class="ep">x-idempotency-key</span></div>
-        <span class="go">View repository <span class="arr">&rarr;</span></span>
-      </a>
-      <a class="card" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-funds" target="_blank" rel="noopener">
-        <div class="top"><div class="name">Funds</div><div class="port">:8084</div></div>
-        <div class="tags"><span class="tag ais">OBIE · CBPII</span><span class="tag">Confirm</span></div>
-        <p>Confirmation of Funds. A yes/no on whether a debtor account can cover an amount — asks the Accounts service, never stores balances itself.</p>
-        <div class="eps"><span class="ep">POST /funds-confirmations</span></div>
-        <span class="go">View repository <span class="arr">&rarr;</span></span>
-      </a>
-      <a class="card" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-party" target="_blank" rel="noopener">
-        <div class="top"><div class="name">Party</div><div class="port">:8085</div></div>
-        <div class="tags"><span class="tag ais">BIAN · Party Ref Data</span></div>
-        <p>Party Reference Data. The customer (PSU) identity behind the accounts — readable only with a consent that carries the <em>ReadParty</em> permission.</p>
-        <div class="eps"><span class="ep">GET /party</span><span class="ep">/parties/{id}</span></div>
-        <span class="go">View repository <span class="arr">&rarr;</span></span>
-      </a>
-      <div class="card" style="cursor:default">
-        <div class="top"><div class="name" style="color:var(--accent-2)">pkg</div><div class="port">shared</div></div>
-        <div class="tags"><span class="tag">Library</span></div>
-        <p>The shared spine: OBIE response &amp; error envelopes, an exact-decimal money type, HTTP middleware, Postgres helpers and the inter-service clients. Vendored into every repo.</p>
-        <span class="go" style="color:var(--muted)">Two test tiers · unit + Postgres</span>
-      </div>
-    </div>
-
-    <!-- architecture schematic -->
-    <figure class="diagram reveal">
+  <figure class="diagram reveal">
+    <div class="card">
       <svg viewBox="0 0 1000 520" width="100%" height="auto" role="img" aria-label="Architecture: four services validate consent against the central Consent service; Funds also checks balances against Accounts.">
         <defs>
-          <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
-            <path d="M0,0 L9,4.5 L0,9 z" fill="#403B30"/>
-          </marker>
-          <marker id="ah2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
-            <path d="M0,0 L9,4.5 L0,9 z" fill="#B24A22"/>
-          </marker>
+          <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#86868b"/></marker>
+          <marker id="ah2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#0071e3"/></marker>
         </defs>
-
-        <!-- connectors (drawn first, under nodes) -->
         <path class="flow" marker-end="url(#ah)" d="M250,135 C370,180 410,210 470,238"/>
         <path class="flow" marker-end="url(#ah)" d="M750,135 C630,180 590,210 530,238"/>
         <path class="flow" marker-end="url(#ah)" d="M250,395 C370,350 410,320 470,292"/>
         <path class="flow" marker-end="url(#ah)" d="M750,395 C630,350 590,320 530,292"/>
         <path class="flow-2" marker-end="url(#ah2)" d="M180,360 L180,180"/>
-
-        <text class="flow-lbl" x="332" y="176">GET /internal/consents/{id}</text>
-        <text class="flow-lbl" x="566" y="176" text-anchor="end">validate</text>
+        <text class="flow-lbl" x="332" y="174">GET /internal/consents/{id}</text>
+        <text class="flow-lbl" x="566" y="174" text-anchor="end">validate</text>
         <text class="flow-lbl" x="332" y="360">validate</text>
         <text class="flow-lbl" x="566" y="360" text-anchor="end">validate &amp; consume</text>
-        <text class="flow-lbl flow-2-lbl" x="192" y="276" fill="#B24A22">funds available?</text>
-
-        <!-- hub -->
-        <rect class="node-hub" x="400" y="225" width="200" height="80" rx="6"/>
+        <text class="flow-lbl" x="192" y="276" fill="#0071e3">funds available?</text>
+        <rect class="node-hub" x="400" y="225" width="200" height="80" rx="16"/>
         <text class="lbl lbl-hub" x="500" y="262" text-anchor="middle" font-size="26">Consent</text>
         <text class="sub sub-hub" x="500" y="284" text-anchor="middle">:8081 · trust anchor</text>
-
-        <!-- satellites -->
-        <g>
-          <rect class="node" x="80" y="95" width="170" height="64" rx="6"/>
-          <text class="lbl" x="165" y="128" text-anchor="middle" font-size="21">Accounts</text>
-          <text class="sub sub-mut" x="165" y="147" text-anchor="middle">:8082 · AISP</text>
-        </g>
-        <g>
-          <rect class="node" x="750" y="95" width="170" height="64" rx="6"/>
-          <text class="lbl" x="835" y="128" text-anchor="middle" font-size="21">Payments</text>
-          <text class="sub sub-mut" x="835" y="147" text-anchor="middle">:8083 · PISP</text>
-        </g>
-        <g>
-          <rect class="node" x="80" y="361" width="170" height="64" rx="6"/>
-          <text class="lbl" x="165" y="394" text-anchor="middle" font-size="21">Funds</text>
-          <text class="sub sub-mut" x="165" y="413" text-anchor="middle">:8084 · CBPII</text>
-        </g>
-        <g>
-          <rect class="node" x="750" y="361" width="170" height="64" rx="6"/>
-          <text class="lbl" x="835" y="394" text-anchor="middle" font-size="21">Party</text>
-          <text class="sub sub-mut" x="835" y="413" text-anchor="middle">:8085 · Party</text>
-        </g>
+        <g><rect class="node" x="80" y="95" width="170" height="64" rx="14"/><text class="lbl" x="165" y="128" text-anchor="middle" font-size="20">Accounts</text><text class="sub sub-mut" x="165" y="147" text-anchor="middle">:8082 · AISP</text></g>
+        <g><rect class="node" x="750" y="95" width="170" height="64" rx="14"/><text class="lbl" x="835" y="128" text-anchor="middle" font-size="20">Payments</text><text class="sub sub-mut" x="835" y="147" text-anchor="middle">:8083 · PISP</text></g>
+        <g><rect class="node" x="80" y="361" width="170" height="64" rx="14"/><text class="lbl" x="165" y="394" text-anchor="middle" font-size="20">Funds</text><text class="sub sub-mut" x="165" y="413" text-anchor="middle">:8084 · CBPII</text></g>
+        <g><rect class="node" x="750" y="361" width="170" height="64" rx="14"/><text class="lbl" x="835" y="394" text-anchor="middle" font-size="20">Party</text><text class="sub sub-mut" x="835" y="413" text-anchor="middle">:8085 · Party</text></g>
       </svg>
-      <figcaption><span>FIG.01 — Consent as the trust anchor</span><span>each service owns its own schema</span></figcaption>
-    </figure>
-  </div>
+      <div class="cap">Consent is the trust anchor — every service validates against it; Funds also checks balances with Accounts.</div>
+    </div>
+  </figure>
 </section>
 
 <!-- 02 WHY -->
-<section id="why">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="sec-no">02</div>
-      <div>
-        <h2 class="sec-title">Why this matters</h2>
-        <p class="sec-lede">Banking software has spent decades as a single, indivisible core — hard to change, harder to open. Open Banking regulation forced the doors open; this estate shows the architecture that makes the openness <b>safe, standard and sustainable</b>.</p>
-      </div>
-    </div>
-    <div class="rows reveal">
-      <div class="row"><div class="n">01</div><div class="body">
-        <h3>Standards instead of bespoke integrations</h3>
-        <p>Every service speaks the same OBIE contract on the wire. A fintech integrates the <em>standard</em> once, not a different proprietary API per bank. The cost of connecting the financial system collapses from N×M to N+M.</p>
-        <span class="pin">OBIE Read/Write APIs</span>
-      </div></div>
-      <div class="row"><div class="n">02</div><div class="body">
-        <h3>Consent-first, by construction</h3>
-        <p>No service trusts the caller's claim of access. Each one fetches and checks the consent — its status, type, permissions and expiry — from the Consent service before doing anything. The customer's authorisation is a hard gate in code, not a policy in a document.</p>
-        <span class="pin">authorise → validate → consume → revoke</span>
-      </div></div>
-      <div class="row"><div class="n">03</div><div class="body">
-        <h3>Capabilities as bounded domains</h3>
-        <p>Following BIAN, each business capability is an independently ownable service domain with its own data and its own schema. Teams ship Accounts without touching Payments. The org chart and the architecture finally agree.</p>
-        <span class="pin">BIAN service domains</span>
-      </div></div>
-      <div class="row"><div class="n">04</div><div class="body">
-        <h3>Replaceable parts, explicit contracts</h3>
-        <p>Behind each service is a clean port: an in-memory store for tests, Postgres for real, a fake client for the upstream. You can swap the datastore, restub a dependency, or rewrite a service entirely — as long as the contract holds.</p>
-        <span class="pin">hexagonal · ports &amp; adapters</span>
-      </div></div>
-      <div class="row"><div class="n">05</div><div class="body">
-        <h3>A reference you can run, not just read</h3>
-        <p>It builds, it tests, it boots with zero infrastructure. Turning an abstract standard into something a team can <code>go run</code> in a minute is how good architecture actually spreads.</p>
-        <span class="pin">in-memory dev · Docker estate</span>
-      </div></div>
-    </div>
+<section id="why" class="band alt">
+  <div class="sec-head reveal">
+    <div class="kicker">Why it matters</div>
+    <h2>Built open. Built safe.</h2>
+    <p>Banking software spent decades as a single, indivisible core. Regulation forced it open — this estate is the architecture that makes the openness standard, safe and sustainable.</p>
+  </div>
+  <div class="feats reveal">
+    <div class="feat"><div class="fk">01</div><h3>Standards, not bespoke integrations</h3><p>Every service speaks the same OBIE contract. A fintech integrates the standard once — not a different proprietary API per bank. Connection cost falls from N×M to N+M.</p></div>
+    <div class="feat"><div class="fk">02</div><h3>Consent-first, by construction</h3><p>No service trusts the caller's claim. Each fetches and checks the consent — status, type, permissions, expiry — before acting. Authorisation is a hard gate in code, not a line in a policy.</p></div>
+    <div class="feat"><div class="fk">03</div><h3>Capabilities as bounded domains</h3><p>Following BIAN, each capability is an independently ownable service domain with its own data and schema. Teams ship Accounts without touching Payments. The org chart and the architecture finally agree.</p></div>
+    <div class="feat"><div class="fk">04</div><h3>Replaceable parts, explicit contracts</h3><p>Behind each service is a clean port: in-memory for tests, Postgres for real, a fake for the upstream. Swap the datastore or rewrite a service — as long as the contract holds.</p></div>
+    <div class="feat full"><div class="fk">05</div><h3>A reference you can run, not just read</h3><p>It builds, it tests, it boots with zero infrastructure — <code>go run .</code> and you have a working bank service. Turning an abstract standard into something a team can run in a minute is how good architecture actually spreads.</p></div>
   </div>
 </section>
 
-<!-- PULL QUOTE -->
-<section class="quote">
+<!-- STATEMENT -->
+<section class="band dark">
   <div class="wrap">
-    <blockquote>The bank stops being a building you visit and becomes <span>a set of capabilities you compose.</span></blockquote>
-    <div class="by">— the thesis of composable, consent-first banking</div>
+    <div class="statement reveal">
+      <h2>The bank stops being a place you visit — and becomes <span class="hl">a set of capabilities you compose.</span></h2>
+      <div class="by">The thesis of composable, consent-first banking</div>
+    </div>
   </div>
 </section>
 
 <!-- 03 HOW -->
-<section id="how">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="sec-no">03</div>
-      <div>
-        <h2 class="sec-title">How it helps banking evolve</h2>
-        <p class="sec-lede">The same five-service shape points at where the industry is going: away from the monolithic core, toward an ecosystem where banking is embedded, governed by consent, and increasingly acted on by software agents.</p>
-      </div>
-    </div>
-    <div class="rows reveal">
-      <div class="row"><div class="n">01</div><div class="body">
-        <h3>From a frozen core to a composable bank</h3>
-        <p>When capabilities are independent services, the bank evolves the <em>parts</em> instead of risking the whole. New products become a recombination of existing domains rather than another change request against a decades-old core that no one dares touch.</p>
-      </div></div>
-      <div class="row"><div class="n">02</div><div class="body">
-        <h3>Open ecosystems &amp; embedded finance</h3>
-        <p>Standard, consent-gated APIs let fintechs, marketplaces and non-banks build on the bank's rails. Payments and account insight show up <em>inside</em> the products people already use — and the bank earns reach it could never build alone.</p>
-      </div></div>
-      <div class="row"><div class="n">03</div><div class="body">
-        <h3>Compliance as a feature, not a bolt-on</h3>
-        <p>The consent lifecycle — granted, scoped, time-boxed, revocable, fully audited — is modelled in the code itself. Regulators get provable control; customers get a clear switch; the bank gets trust it can demonstrate, not just assert.</p>
-      </div></div>
-      <div class="row"><div class="n">04</div><div class="body">
-        <h3>A foundation for agentic finance</h3>
-        <p>As AI agents begin to move money and read accounts on a customer's behalf, the consent boundary becomes essential infrastructure: an agent operates only within an explicit, permissioned, revocable grant. The same gate that protects a human is what keeps autonomous software safe.</p>
-      </div></div>
-      <div class="row"><div class="n">05</div><div class="body">
-        <h3>A lower cost of change</h3>
-        <p>Swap Postgres for another store, add a second market's API flavour (Berlin Group, FDX), split a hot domain or scale it alone — each is a local move behind a stable contract, not a bank-wide migration. Evolution becomes routine instead of existential.</p>
-      </div></div>
-    </div>
+<section id="how" class="band">
+  <div class="sec-head reveal">
+    <div class="kicker">How banking evolves</div>
+    <h2>Where banking goes next.</h2>
+    <p>The same five-service shape points at where the industry is headed — away from the monolithic core, toward an ecosystem that is embedded, consent-governed, and increasingly acted on by software agents.</p>
+  </div>
+  <div class="feats reveal">
+    <div class="feat"><div class="fk">01</div><h3>From a frozen core to a composable bank</h3><p>When capabilities are independent services, the bank evolves the parts instead of risking the whole. New products become a recombination of existing domains — not another change request against a core no one dares touch.</p></div>
+    <div class="feat"><div class="fk">02</div><h3>Open ecosystems &amp; embedded finance</h3><p>Standard, consent-gated APIs let fintechs, marketplaces and non-banks build on the bank's rails. Payments and account insight show up inside the products people already use.</p></div>
+    <div class="feat"><div class="fk">03</div><h3>Compliance as a feature, not a bolt-on</h3><p>The consent lifecycle — granted, scoped, time-boxed, revocable, audited — is modelled in the code itself. Regulators get provable control; customers get a clear switch; the bank gets trust it can demonstrate.</p></div>
+    <div class="feat"><div class="fk">04</div><h3>A foundation for agentic finance</h3><p>As AI agents begin to move money and read accounts on a customer's behalf, the consent boundary becomes essential infrastructure: an agent operates only within an explicit, permissioned, revocable grant. The same gate that protects a human keeps autonomous software safe.</p></div>
+    <div class="feat full"><div class="fk">05</div><h3>A lower cost of change</h3><p>Swap Postgres for another store, add a second market's API flavour (Berlin Group, FDX), split a hot domain or scale it alone — each is a local move behind a stable contract, not a bank-wide migration. Evolution becomes routine instead of existential.</p></div>
   </div>
 </section>
 
 <!-- REPOS -->
-<section id="repos">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <div class="sec-no">04</div>
-      <div>
-        <h2 class="sec-title">The repositories</h2>
-        <p class="sec-lede">One repository per microservice. Each is fully self-contained — its own SQL migrations, a vendored copy of the shared library, a Dockerfile and tests — so it clones and builds on its own.</p>
-      </div>
-    </div>
-    <div class="repos reveal">
-      <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-consent" target="_blank" rel="noopener"><span class="nm">openbank-consent<small>Consent lifecycle · :8081</small></span><span class="ic">&nearr;</span></a>
-      <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-accounts" target="_blank" rel="noopener"><span class="nm">openbank-accounts<small>AISP · accounts/balances/txns · :8082</small></span><span class="ic">&nearr;</span></a>
-      <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-payments" target="_blank" rel="noopener"><span class="nm">openbank-payments<small>PISP · domestic payments · :8083</small></span><span class="ic">&nearr;</span></a>
-      <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-funds" target="_blank" rel="noopener"><span class="nm">openbank-funds<small>CBPII · confirmation of funds · :8084</small></span><span class="ic">&nearr;</span></a>
-      <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-party" target="_blank" rel="noopener"><span class="nm">openbank-party<small>Party reference data · :8085</small></span><span class="ic">&nearr;</span></a>
-    </div>
-
-    <div class="runbox reveal">
-      <div class="hd">Run any service in one command — zero infrastructure</div>
+<section id="repos" class="band alt">
+  <div class="sec-head reveal">
+    <div class="kicker">Get the code</div>
+    <h2>One repo per service.</h2>
+    <p>Each repository is fully self-contained — its own SQL migrations, a vendored copy of the shared library, a Dockerfile and tests — so it clones and builds on its own.</p>
+  </div>
+  <div class="repolist reveal">
+    <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-consent" target="_blank" rel="noopener"><span class="nm">openbank-consent<small>Consent lifecycle · :8081</small></span><span class="ch">›</span></a>
+    <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-accounts" target="_blank" rel="noopener"><span class="nm">openbank-accounts<small>AISP · accounts / balances / transactions · :8082</small></span><span class="ch">›</span></a>
+    <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-payments" target="_blank" rel="noopener"><span class="nm">openbank-payments<small>PISP · domestic payments · :8083</small></span><span class="ch">›</span></a>
+    <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-funds" target="_blank" rel="noopener"><span class="nm">openbank-funds<small>CBPII · confirmation of funds · :8084</small></span><span class="ch">›</span></a>
+    <a class="repo" href="https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-party" target="_blank" rel="noopener"><span class="nm">openbank-party<small>Party reference data · :8085</small></span><span class="ch">›</span></a>
+  </div>
+  <div class="runbox reveal">
+    <div class="hd">Run any service in one command — zero infrastructure</div>
 <pre><span class="c"># clone a service and start it with an in-memory store</span>
 git clone https://github.com/Sreenivas-Sadhu-Prabhakara/openbank-consent.git
 cd openbank-consent && go run .
@@ -415,39 +360,25 @@ curl -X POST localhost:8081/account-access-consents <span class="p">\</span>
   -d '{"Data":{"Permissions":["ReadBalances","ReadParty"]},"Risk":{}}'
 curl -X POST localhost:8081/internal/consents/<span class="p">{id}</span>/authorise
 curl localhost:8082/accounts -H <span class="p">"x-consent-id: {id}"</span></pre>
-    </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <div class="grid2">
-      <div class="mark"><span class="dot"></span> openbank&middot;bian</div>
-      <div>UK Open Banking (OBIE) &times; BIAN service domains &times; Go 1.25 &middot; built as a teaching reference.</div>
+    <div class="top">
+      <div class="brand">openbank-bian</div>
+      <div>UK Open Banking (OBIE) × BIAN service domains × Go 1.25 — built as a teaching reference.</div>
     </div>
-    <p class="disclaimer">
-      <strong>Disclaimer.</strong> This is an independent, educational reference implementation. It is <em>not</em> production software and is not affiliated with, endorsed by, or certified against OBIE / Open Banking Limited or BIAN. Security is intentionally simplified: the FAPI security profile (OAuth2/OIDC, MTLS, signed request objects) is stubbed, and an internal endpoint stands in for the PSU authentication redirect. Do not use as-is to handle real customer data or live payments.
-    </p>
+    <p class="disc"><strong>Disclaimer.</strong> Independent, educational reference implementation. Not production software, and not affiliated with, endorsed by, or certified against OBIE / Open Banking Limited or BIAN. Security is intentionally simplified: the FAPI security profile (OAuth2/OIDC, MTLS, signed request objects) is stubbed, and an internal endpoint stands in for the PSU authentication redirect. Do not use as-is for real customer data or live payments.</p>
   </div>
 </footer>
 
 <script>
-  // scroll progress
-  var prog = document.getElementById('progress');
-  function onScroll(){
-    var h = document.documentElement, max = h.scrollHeight - h.clientHeight;
-    prog.style.width = (max>0 ? (h.scrollTop/max*100) : 0) + '%';
-  }
-  document.addEventListener('scroll', onScroll, {passive:true}); onScroll();
-
-  // staggered hero reveal on load
   window.addEventListener('load', function(){
     document.querySelectorAll('.hero .reveal').forEach(function(el,i){
-      setTimeout(function(){ el.classList.add('in'); }, 120 + i*130);
+      setTimeout(function(){ el.classList.add('in'); }, 90 + i*110);
     });
   });
-
-  // intersection reveal for the rest
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
   }, {threshold:0.12, rootMargin:'0px 0px -8% 0px'});
