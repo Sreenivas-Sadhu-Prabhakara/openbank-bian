@@ -1,0 +1,15 @@
+{
+  "name": "openbank-bian — Open Banking, decomposed",
+  "short_name": "openbank-bian",
+  "description": "A runnable reference implementation of UK Open Banking (OBIE) rebuilt as BIAN-style microservices in Go.",
+  "start_url": "/openbank-bian/",
+  "scope": "/openbank-bian/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0071e3",
+  "icons": [
+    { "src": "/openbank-bian/assets/favicon-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/openbank-bian/assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/openbank-bian/assets/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" }
+  ]
+}

@@ -5,10 +5,118 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>openbank-bian — Open Banking, decomposed</title>
 <meta name="description" content="A runnable reference implementation of UK Open Banking (OBIE) rebuilt as BIAN-style microservices in Go — what each service is, why it matters, and how composable, consent-first banking helps the industry evolve." />
+<!-- SEO:START (idempotent; regenerated as a block) -->
+<meta name="keywords" content="Open Banking, OBIE, Open Banking API, BIAN, service domains, banking microservices, Go, AISP, PISP, CBPII, consent, PSD2, account information API, payment initiation API, confirmation of funds, open banking reference implementation, FAPI, composable banking, embedded finance" />
+<meta name="author" content="Sreenivas Sadhu Prabhakara" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+<meta name="theme-color" content="#0071e3" />
+<link rel="canonical" href="https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/" />
+
+<meta property="og:site_name" content="openbank-bian" />
 <meta property="og:title" content="openbank-bian — Open Banking, decomposed" />
-<meta property="og:description" content="UK Open Banking (OBIE) rebuilt as five BIAN microservices in Go. What is what, why it matters, and how composable consent-first banking helps the industry evolve." />
+<meta property="og:description" content="A runnable reference implementation of UK Open Banking (OBIE) rebuilt as five BIAN-style microservices in Go — consent-first AISP, PISP and CBPII services you can clone and run in seconds." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/" />
+<meta property="og:locale" content="en_GB" />
+<meta property="og:image" content="https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/assets/og/openbank-bian.png" />
+<meta property="og:image:secure_url" content="https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/assets/og/openbank-bian.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="openbank-bian — Open Banking, decomposed. Consent, Accounts, Payments, Funds and Party microservices in Go." />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="openbank-bian — Open Banking, decomposed" />
+<meta name="twitter:description" content="UK Open Banking (OBIE) rebuilt as five consent-first BIAN microservices in Go. Clone one service, run it with zero infrastructure." />
+<meta name="twitter:image" content="https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/assets/og/openbank-bian.png" />
+<meta name="twitter:image:alt" content="openbank-bian — Open Banking, decomposed into five Go microservices." />
+
+<link rel="icon" type="image/svg+xml" href="/openbank-bian/assets/favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="/openbank-bian/assets/favicon-32.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/openbank-bian/assets/apple-touch-icon.png" />
+<link rel="manifest" href="/openbank-bian/site.webmanifest" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/#website",
+      "url": "https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/",
+      "name": "openbank-bian — Open Banking, decomposed",
+      "description": "A runnable reference implementation of UK Open Banking (OBIE) rebuilt as BIAN-style microservices in Go.",
+      "inLanguage": "en-GB",
+      "publisher": { "@id": "https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/#author" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/#author",
+      "name": "Sreenivas Sadhu Prabhakara",
+      "url": "https://github.com/Sreenivas-Sadhu-Prabhakara"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "openbank-bian",
+      "description": "UK Open Banking (OBIE) Read/Write APIs decomposed into BIAN-style service domains as five independent, consent-first Go microservices: Consent, Accounts (AISP), Payments (PISP), Funds (CBPII) and Party.",
+      "url": "https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/",
+      "codeRepository": "https://github.com/Sreenivas-Sadhu-Prabhakara?tab=repositories&q=openbank",
+      "programmingLanguage": "Go",
+      "runtimePlatform": "Go 1.25",
+      "license": "https://opensource.org/licenses/MIT",
+      "keywords": "Open Banking, OBIE, BIAN, microservices, AISP, PISP, CBPII, consent, Go, Postgres",
+      "author": { "@id": "https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/#author" },
+      "about": [
+        { "@type": "Thing", "name": "Open Banking" },
+        { "@type": "Thing", "name": "BIAN service domains" },
+        { "@type": "Thing", "name": "Banking microservices" }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "openbank-bian", "item": "https://sreenivas-sadhu-prabhakara.github.io/openbank-bian/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Open Banking (OBIE)?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Open Banking is a UK regulatory standard, defined by the Open Banking Implementation Entity (OBIE), that lets customers securely share bank data and initiate payments through authorised third parties using standard APIs instead of screen-scraping. openbank-bian implements the OBIE Read/Write Account, Transaction and Payment Initiation APIs." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is BIAN and how does it relate to Open Banking?",
+          "acceptedAnswer": { "@type": "Answer", "text": "BIAN (Banking Industry Architecture Network) is a reference framework that decomposes a bank into independent service domains. openbank-bian maps the OBIE APIs onto BIAN service domains — Consent Administration, Payment Order and Party Reference Data — so each capability is an independently deployable microservice." }
+        },
+        {
+          "@type": "Question",
+          "name": "What do AISP, PISP and CBPII mean?",
+          "acceptedAnswer": { "@type": "Answer", "text": "They are the three regulated Open Banking roles. AISP (Account Information Service Provider) reads accounts, balances and transactions; PISP (Payment Initiation Service Provider) initiates payments; CBPII (Card-Based Payment Instrument Issuer) checks confirmation of funds. openbank-bian ships one service per role plus a central Consent service." }
+        },
+        {
+          "@type": "Question",
+          "name": "What does a consent-first architecture mean?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Every service independently fetches and validates an authorised consent — its status, type, permissions and expiry — before reading data or moving money. Authorisation is enforced in code as a hard gate, never assumed from the caller." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is openbank-bian production-ready?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. It is an educational reference implementation. The FAPI security profile (OAuth2/OIDC, MTLS, signed request objects) is intentionally stubbed, and it is not affiliated with or certified by OBIE / Open Banking Limited or BIAN. Do not use it as-is for real customer data or live payments." }
+        },
+        {
+          "@type": "Question",
+          "name": "What technology stack does it use, and can I run it without infrastructure?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It is built as Go 1.25 microservices with an optional Postgres backend and around 97 tests across two tiers (in-memory unit tests plus Postgres integration tests via testcontainers). Each service runs with zero infrastructure: git clone, go run ., and an in-memory store boots a working Open Banking service in seconds." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+<!-- SEO:END -->
 <style>
   :root{
     --bg:#ffffff; --bg-2:#f5f5f7; --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#86868b;
@@ -173,6 +281,19 @@
   footer .brand{font-weight:600; color:var(--ink-2); font-size:14px}
   footer .disc{margin-top:18px; max-width:74ch}
   footer a{color:var(--ink-2)}
+
+  /* ---------- faq ---------- */
+  .faq{max-width:840px; margin:34px auto 0; border-top:1px solid var(--line-soft)}
+  .faq details{border-bottom:1px solid var(--line-soft)}
+  .faq summary{list-style:none; cursor:pointer; padding:22px 46px 22px 4px; position:relative;
+    font-size:21px; font-weight:600; letter-spacing:-.01em; color:var(--ink)}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+"; position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    font-size:27px; font-weight:300; color:var(--ink-3); transition:color .2s ease}
+  .faq details[open] summary::after{content:"\2013"}
+  .faq summary:hover{color:var(--blue)} .faq summary:hover::after{color:var(--blue)}
+  .faq .ans{padding:0 4px 24px; color:var(--ink-2); font-size:17px; line-height:1.62; max-width:72ch}
+  .faq .ans code{font-family:var(--mono); font-size:14px; background:var(--bg-2); padding:2px 6px; border-radius:6px}
 </style>
 </head>
 <body>
@@ -185,6 +306,7 @@
       <a href="#why">Why</a>
       <a href="#how">Evolution</a>
       <a href="#repos">Code</a>
+      <a href="#faq">FAQ</a>
     </div>
     <a class="links-gh" href="https://github.com/Sreenivas-Sadhu-Prabhakara?tab=repositories&q=openbank" target="_blank" rel="noopener" style="font-size:12px;color:var(--ink-2)">GitHub ›</a>
   </div>
@@ -360,6 +482,41 @@ curl -X POST localhost:8081/account-access-consents <span class="p">\</span>
   -d '{"Data":{"Permissions":["ReadBalances","ReadParty"]},"Risk":{}}'
 curl -X POST localhost:8081/internal/consents/<span class="p">{id}</span>/authorise
 curl localhost:8082/accounts -H <span class="p">"x-consent-id: {id}"</span></pre>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="band">
+  <div class="sec-head reveal">
+    <div class="kicker">Questions</div>
+    <h2>Open Banking, explained.</h2>
+    <p>Short answers to what OBIE, BIAN and consent-first microservices actually mean — and what this reference is (and isn't).</p>
+  </div>
+  <div class="faq reveal">
+    <details>
+      <summary>What is Open Banking (OBIE)?</summary>
+      <div class="ans">Open Banking is a UK regulatory standard, defined by the Open Banking Implementation Entity (OBIE), that lets customers securely share bank data and initiate payments through authorised third parties using standard APIs instead of screen-scraping. <strong>openbank-bian</strong> implements the OBIE Read/Write Account, Transaction and Payment Initiation APIs.</div>
+    </details>
+    <details>
+      <summary>What is BIAN, and how does it relate to Open Banking?</summary>
+      <div class="ans">BIAN (Banking Industry Architecture Network) is a reference framework that decomposes a bank into independent <em>service domains</em>. openbank-bian maps the OBIE APIs onto BIAN service domains — Consent Administration, Payment Order and Party Reference Data — so each capability is an independently deployable microservice.</div>
+    </details>
+    <details>
+      <summary>What do AISP, PISP and CBPII mean?</summary>
+      <div class="ans">They are the three regulated Open Banking roles. <strong>AISP</strong> (Account Information Service Provider) reads accounts, balances and transactions; <strong>PISP</strong> (Payment Initiation Service Provider) initiates payments; <strong>CBPII</strong> (Card-Based Payment Instrument Issuer) checks confirmation of funds. openbank-bian ships one service per role plus a central Consent service.</div>
+    </details>
+    <details>
+      <summary>What does a “consent-first” architecture mean?</summary>
+      <div class="ans">Every service independently fetches and validates an authorised consent — its status, type, permissions and expiry — before reading data or moving money. Authorisation is enforced in code as a hard gate, never assumed from the caller.</div>
+    </details>
+    <details>
+      <summary>Is openbank-bian production-ready?</summary>
+      <div class="ans">No — it is an educational reference implementation. The FAPI security profile (OAuth2/OIDC, MTLS, signed request objects) is intentionally stubbed, and it is not affiliated with or certified by OBIE / Open Banking Limited or BIAN. Do not use it as-is for real customer data or live payments.</div>
+    </details>
+    <details>
+      <summary>What stack does it use, and can I run it without infrastructure?</summary>
+      <div class="ans">It is built as Go 1.25 microservices with an optional Postgres backend and ~97 tests across two tiers (in-memory unit tests plus Postgres integration tests via testcontainers). Each service runs with zero infrastructure: <code>git clone</code>, <code>go run .</code>, and an in-memory store boots a working Open Banking service in seconds.</div>
+    </details>
   </div>
 </section>
 
